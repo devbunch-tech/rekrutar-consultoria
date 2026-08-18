@@ -60,9 +60,29 @@ shopifyRouter.post(
       (order.note_attributes ?? []).map((a) => [a.name, a.value]),
     ) as Record<string, string>;
 
+    // A Shopify não garante que os customAttributes da draft order cheguem como
+    // note_attributes do pedido, então há três estratégias, da mais forte para a
+    // mais fraca. A busca por e-mail exige cobrança pendente: sem isso, qualquer
+    // compra avulsa na loja feita pelo mesmo e-mail ativaria a parceria.
+    const porAtributo = attrs.empresa_id
+      ? await Company.findById(attrs.empresa_id).catch(() => null)
+      : null;
+    const porCnpj = porAtributo ?? (attrs.cnpj ? await Company.findOne({ cnpj: attrs.cnpj }) : null);
     const company =
-      (attrs.empresa_id ? await Company.findById(attrs.empresa_id).catch(() => null) : null) ??
-      (attrs.cnpj ? await Company.findOne({ cnpj: attrs.cnpj }) : null);
+      porCnpj ??
+      (order.email
+        ? await Company.findOne({
+            email: order.email.toLowerCase(),
+            shopifyDraftOrderId: { $exists: true, $ne: null },
+            shopifySubscriptionActive: { $ne: true },
+          })
+        : null);
+
+    if (company && !porAtributo && !porCnpj) {
+      console.warn(
+        `[shopify] empresa ${company._id} casada por e-mail — customAttributes não chegaram no pedido.`,
+      );
+    }
 
     if (!company) {
       // 200 evita reentregas infinitas da Shopify por um pedido que não é de parceria.

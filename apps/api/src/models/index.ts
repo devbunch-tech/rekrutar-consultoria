@@ -38,6 +38,11 @@ const companySchema = new Schema(
     shopifyOrderId: { type: String },
     shopifySubscriptionActive: { type: Boolean, default: false },
     assinaturaAtivaEm: { type: Date },
+    // Cobrança negociada (draft order + invoice)
+    shopifyDraftOrderId: { type: String },
+    invoiceUrl: { type: String },
+    valorNegociado: { type: Number },
+    cobrancaEnviadaEm: { type: Date },
     observacoes: { type: String },
   },
   { timestamps: true },

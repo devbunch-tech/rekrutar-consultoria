@@ -69,12 +69,43 @@ domínios finais, separados por vírgula.
    Sem ele o HMAC não é validado — ver [`shopify.ts`](apps/api/src/shopify.ts).
 3. `SHOPIFY_STORE_DOMAIN=rekrutar-consultoria-a7rjikag.myshopify.com`
 
-## Pendência de produto: checkout negociado
+## Checkout negociado (implementado)
 
-O código hoje monta um permalink com variante de preço **fixo**
-(`SHOPIFY_SUBSCRIPTION_VARIANT_ID`). Isso é self-service, não negociado.
+O valor é combinado caso a caso, então não há preço fixo. O fluxo é:
 
-Como o fechamento é manual, o caminho natural é **draft order**: o proprietário
-cria o pedido com o valor combinado no Shopify Admin e envia o invoice. O
-webhook `orders/paid` continua funcionando sem alteração, desde que o campo
-`empresa_id` seja preenchido em *note attributes* ao criar a draft order.
+1. Empresa envia a intenção no portal → `Company` com status **novo**.
+   O portal **não** mostra mais link de pagamento — só avisa que a equipe
+   entrará em contato.
+2. Proprietário negocia → status **em_contato**.
+3. No admin, em *Empresas*, botão **Gerar cobrança**: digita o valor combinado.
+   A API cria uma *draft order* na Shopify com item personalizado e dispara o
+   invoice por e-mail → status **checkout_enviado**.
+4. Empresa paga → webhook `orders/paid` → status **ativo** e acesso criado.
+
+### O que configurar na Shopify
+
+Criar um **app customizado** na loja (Settings → Apps → Develop apps) com o
+escopo **`write_draft_orders`** e copiar o Admin API access token (`shpat_…`)
+para `SHOPIFY_ADMIN_TOKEN`.
+
+Sem esse token o botão não aparece no admin e a ativação manual continua
+disponível como saída.
+
+### Uma ressalva honesta
+
+A Shopify não documenta que os `customAttributes` da draft order chegam como
+`note_attributes` do pedido final — e é por ali que o webhook liga o pagamento
+à empresa. Por isso o matching em [`shopify.ts`](apps/api/src/shopify.ts) tem
+três estratégias em cascata: `empresa_id`, CNPJ e, por último, e-mail — este
+restrito a empresas com cobrança pendente e ainda sem assinatura ativa, para
+que uma compra avulsa na loja não ative uma parceria por engano.
+
+**Vale confirmar no primeiro pagamento real** qual estratégia casou: se o log
+mostrar `casada por e-mail`, os atributos não propagaram e o fallback está
+carregando o fluxo.
+
+## Resto do permalink antigo
+
+`shopifyCheckout` e `PartnerLeadResult.checkout` continuam no schema da API
+(preço fixo via `SHOPIFY_SUBSCRIPTION_VARIANT_ID`), mas nenhum front-end os
+consome mais. Ficaram para não quebrar integrações; podem ser removidos.

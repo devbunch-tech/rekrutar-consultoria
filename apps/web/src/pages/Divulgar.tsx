@@ -16,7 +16,6 @@ const BENEFICIOS = [
 interface Resultado {
   enviarIntencaoParceria: {
     company: { id: string; razaoSocial: string };
-    checkout: { url: string; configurado: boolean };
   };
 }
 
@@ -24,13 +23,12 @@ export function Divulgar() {
   const navigate = useNavigate();
   const showToast = useToast();
   const [enviarParceria, { loading }] = useMutation<Resultado>(ENVIAR_PARCERIA);
-  const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
   const [enviado, setEnviado] = useState(false);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
-    const { data } = await enviarParceria({
+    await enviarParceria({
       variables: {
         input: {
           responsavel: String(form.get('nome')),
@@ -43,8 +41,6 @@ export function Divulgar() {
         },
       },
     });
-    const checkout = data?.enviarIntencaoParceria.checkout;
-    setCheckoutUrl(checkout?.configurado ? checkout.url : null);
     setEnviado(true);
     showToast('Intenção de parceria enviada!');
   }
@@ -163,34 +159,9 @@ export function Divulgar() {
               </h2>
               <p style={{ margin: 0, fontSize: 14, color: color.textMuted, lineHeight: 1.6 }}>
                 Recebemos os dados da sua empresa. Nossa equipe entrará em contato em até 1 dia útil
-                para apresentar a parceria.
+                para apresentar a parceria e, ao fechar, enviaremos o link de pagamento por e-mail.
               </p>
 
-              {checkoutUrl && (
-                <>
-                  <a
-                    href={checkoutUrl}
-                    className="rk-hover-cta"
-                    style={{
-                      display: 'block',
-                      marginTop: 24,
-                      background: color.blue,
-                      color: '#fff',
-                      borderRadius: radius.control,
-                      padding: 15,
-                      fontWeight: 700,
-                      fontSize: 15,
-                      textDecoration: 'none',
-                    }}
-                  >
-                    Ativar assinatura agora →
-                  </a>
-                  <p style={{ margin: '10px 0 0', fontSize: 11.5, color: color.textFaint }}>
-                    Você será levado ao checkout seguro da Shopify. A parceria é liberada assim que o
-                    pagamento é confirmado.
-                  </p>
-                </>
-              )}
             </div>
           ) : (
             <>

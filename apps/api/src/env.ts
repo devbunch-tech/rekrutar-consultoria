@@ -15,5 +15,8 @@ export const env = {
     variantId: process.env.SHOPIFY_SUBSCRIPTION_VARIANT_ID ?? '',
     sellingPlanId: process.env.SHOPIFY_SELLING_PLAN_ID ?? '',
     webhookSecret: process.env.SHOPIFY_WEBHOOK_SECRET ?? '',
+    // Admin API — necessária para emitir a cobrança negociada (draft order).
+    adminToken: process.env.SHOPIFY_ADMIN_TOKEN ?? '',
+    apiVersion: process.env.SHOPIFY_API_VERSION ?? '2026-07',
   },
 };

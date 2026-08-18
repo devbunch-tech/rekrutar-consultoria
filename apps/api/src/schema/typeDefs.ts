@@ -59,6 +59,10 @@ export const typeDefs = /* GraphQL */ `
     shopifySubscriptionActive: Boolean!
     shopifyOrderId: String
     assinaturaAtivaEm: DateTime
+    """Cobrança negociada: link do invoice da draft order."""
+    invoiceUrl: String
+    valorNegociado: Float
+    cobrancaEnviadaEm: DateTime
     observacoes: String
     totalVagas: Int!
     createdAt: DateTime!
@@ -209,6 +213,14 @@ export const typeDefs = /* GraphQL */ `
     configurado: Boolean!
   }
 
+  type CobrancaParceria {
+    """Link do invoice da Shopify para a empresa pagar."""
+    invoiceUrl: String!
+    """O invoice foi disparado por e-mail para a empresa?"""
+    enviadoPorEmail: Boolean!
+    empresa: Company!
+  }
+
   type PartnerLeadResult {
     company: Company!
     checkout: ShopifyCheckout!
@@ -323,6 +335,8 @@ export const typeDefs = /* GraphQL */ `
     users(role: Role): [User!]!
     contactMessages(apenasNaoLidas: Boolean): [ContactMessage!]!
     shopifyCheckout: ShopifyCheckout!
+    """A Admin API está configurada para emitir cobranças negociadas?"""
+    cobrancaParceriaConfigurada: Boolean!
   }
 
   type Mutation {
@@ -349,6 +363,16 @@ export const typeDefs = /* GraphQL */ `
     # Admin — empresas
     atualizarEmpresa(id: ID!, input: CompanyUpdateInput!): Company!
     ativarAssinaturaEmpresa(id: ID!, shopifyOrderId: String): Company!
+    """
+    Emite a cobrança negociada da parceria: cria uma draft order na Shopify
+    com o valor combinado e, se enviarEmail, dispara o invoice para a empresa.
+    """
+    gerarCobrancaParceria(
+      id: ID!
+      valor: Float!
+      descricao: String
+      enviarEmail: Boolean
+    ): CobrancaParceria!
     removerEmpresa(id: ID!): Boolean!
 
     # Admin — usuários e conteúdo

@@ -190,12 +190,32 @@ export const ADMIN_COMPANIES = gql`
       shopifySubscriptionActive
       shopifyOrderId
       assinaturaAtivaEm
+      invoiceUrl
+      valorNegociado
+      cobrancaEnviadaEm
       totalVagas
       createdAt
     }
-    shopifyCheckout {
-      url
-      configurado
+    cobrancaParceriaConfigurada
+  }
+`;
+
+export const GERAR_COBRANCA = gql`
+  mutation GerarCobranca($id: ID!, $valor: Float!, $descricao: String, $enviarEmail: Boolean) {
+    gerarCobrancaParceria(
+      id: $id
+      valor: $valor
+      descricao: $descricao
+      enviarEmail: $enviarEmail
+    ) {
+      invoiceUrl
+      enviadoPorEmail
+      empresa {
+        id
+        status
+        invoiceUrl
+        valorNegociado
+      }
     }
   }
 `;

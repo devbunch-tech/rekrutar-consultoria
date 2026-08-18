@@ -2,6 +2,7 @@ import { GraphQLError } from 'graphql';
 import { DateTimeResolver } from 'graphql-scalars';
 import mongoose, { type FilterQuery } from 'mongoose';
 import type { GraphQLContext } from '../context.js';
+import { cobrancaConfigurada, criarCobrancaParceria } from '../shopify-admin.js';
 import {
   hashPassword,
   requireAdmin,
@@ -270,6 +271,7 @@ export const resolvers = {
     },
 
     shopifyCheckout: () => shopifyCheckoutUrl(),
+    cobrancaParceriaConfigurada: () => cobrancaConfigurada(),
   },
 
   /* --------------------------------------------------------------- Mutation */
@@ -528,6 +530,44 @@ export const resolvers = {
       );
       if (!company) throw new GraphQLError('Empresa não encontrada.');
       return company;
+    },
+
+    gerarCobrancaParceria: async (
+      _p: unknown,
+      {
+        id,
+        valor,
+        descricao,
+        enviarEmail = true,
+      }: { id: string; valor: number; descricao?: string; enviarEmail?: boolean },
+      ctx: GraphQLContext,
+    ) => {
+      requireAdmin(ctx.user);
+      const company = await Company.findById(oid(id));
+      if (!company) throw new GraphQLError('Empresa não encontrada.');
+
+      let cobranca;
+      try {
+        cobranca = await criarCobrancaParceria({ company, valor, descricao, enviarEmail });
+      } catch (err) {
+        // A mensagem já vem em português e descreve o que falhou na Shopify.
+        throw new GraphQLError(err instanceof Error ? err.message : 'Falha ao emitir a cobrança.');
+      }
+
+      company.shopifyDraftOrderId = cobranca.draftOrderId;
+      company.invoiceUrl = cobranca.invoiceUrl;
+      company.valorNegociado = valor;
+      company.cobrancaEnviadaEm = new Date();
+      if (company.status === 'novo' || company.status === 'em_contato') {
+        company.status = 'checkout_enviado';
+      }
+      await company.save();
+
+      return {
+        invoiceUrl: cobranca.invoiceUrl,
+        enviadoPorEmail: cobranca.enviadoPorEmail,
+        empresa: company,
+      };
     },
 
     removerEmpresa: async (_p: unknown, { id }: { id: string }, ctx: GraphQLContext) => {

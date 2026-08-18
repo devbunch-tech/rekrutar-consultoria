@@ -27,3 +27,5 @@ services:
         sync: false
       - key: SHOPIFY_WEBHOOK_SECRET
         sync: false
+      - key: SHOPIFY_ADMIN_TOKEN
+        sync: false   # token do app customizado (write_draft_orders)

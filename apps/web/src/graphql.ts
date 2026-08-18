@@ -220,10 +220,6 @@ export const ENVIAR_PARCERIA = gql`
         id
         razaoSocial
       }
-      checkout {
-        url
-        configurado
-      }
     }
   }
 `;
