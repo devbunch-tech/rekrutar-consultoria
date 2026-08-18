@@ -12,7 +12,7 @@ import { typeDefs } from './schema/typeDefs.js';
 import { resolvers } from './resolvers/index.js';
 import { userFromHeader } from './auth.js';
 import type { GraphQLContext } from './context.js';
-import { UPLOAD_DIR, uploadRouter } from './uploads.js';
+import { uploadRouter } from './uploads.js';
 import { shopifyRouter } from './shopify.js';
 import { seed } from './seed.js';
 
@@ -34,7 +34,6 @@ async function main(): Promise<void> {
   app.use(shopifyRouter);
   app.use(express.json({ limit: '1mb' }));
   app.use(uploadRouter);
-  app.use('/uploads', express.static(UPLOAD_DIR));
   app.get('/health', (_req, res) => {
     res.json({ ok: true, service: 'rekrutar-api' });
   });
