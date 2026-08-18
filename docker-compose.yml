@@ -1,0 +1,12 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: rekrutar-mongo
+    restart: unless-stopped
+    ports:
+      - "27022:27017"
+    volumes:
+      - rekrutar-mongo-data:/data/db
+
+volumes:
+  rekrutar-mongo-data:

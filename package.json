@@ -1,0 +1,28 @@
+{
+  "name": "rekrutar-portal",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Portal de vagas Rekrutar Consultoria — React + TypeScript + GraphQL + MongoDB",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -n api,web,admin -c blue,green,magenta \"npm:dev:api\" \"npm:dev:web\" \"npm:dev:admin\"",
+    "dev:api": "npm run dev --workspace @rekrutar/api",
+    "dev:web": "npm run dev --workspace @rekrutar/web",
+    "dev:admin": "npm run dev --workspace @rekrutar/admin",
+    "build": "npm run build --workspace @rekrutar/tokens && npm run build --workspace @rekrutar/api && npm run build --workspace @rekrutar/web && npm run build --workspace @rekrutar/admin",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "seed": "npm run seed --workspace @rekrutar/api",
+    "mongo:up": "docker compose up -d mongo",
+    "mongo:down": "docker compose down"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "typescript": "^5.7.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

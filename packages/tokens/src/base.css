@@ -1,0 +1,99 @@
+/* Base global compartilhada pelo portal e pelo admin. Espelha o <style> do protótipo. */
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap');
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #f4f7fa;
+  font-family: 'Sora', system-ui, sans-serif;
+  color: #1b2b36;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: #0a66c2;
+  text-decoration: none;
+}
+a:hover {
+  color: #084d92;
+  text-decoration: underline;
+}
+
+input,
+select,
+textarea,
+button {
+  font-family: 'Sora', system-ui, sans-serif;
+}
+
+@keyframes rkDrawer {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes rkFade {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes rkToast {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 16px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+/* Hovers do protótipo (o handoff usa style-hover; aqui viram classes utilitárias). */
+.rk-hover-card:hover {
+  border-color: #0a66c2 !important;
+}
+.rk-hover-cta:hover {
+  background: #084d92 !important;
+}
+.rk-hover-cta-bright:hover {
+  background: #0d78e3 !important;
+}
+.rk-hover-soft:hover {
+  background: #dce9f6 !important;
+}
+.rk-hover-navy:hover {
+  background: #0e2a38 !important;
+}
+.rk-hover-drawer:hover {
+  background: rgba(255, 255, 255, 0.08);
+  text-decoration: none;
+}
+.rk-hover-outline:hover {
+  border-color: #fff !important;
+  color: #fff !important;
+}
+.rk-hover-row:hover {
+  background: #f7fafc;
+}
+.rk-hover-footer:hover {
+  color: #fff !important;
+  text-decoration: none;
+}
+.rk-hover-header-btn:hover {
+  background: #f4f7fa;
+}
+.rk-hover-white:hover {
+  background: #eaf1f8 !important;
+}
